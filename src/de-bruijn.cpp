@@ -4,8 +4,35 @@
 #include <stack>
 #include <vector>
 #include <sdsl/bit_vectors.hpp>
+#include <sdsl/rank_support.hpp>
+#include <sdsl/select_support.hpp>
 #include <sdsl/suffix_arrays.hpp>
 #include <sdsl/wavelet_trees.hpp>
+
+namespace aux{
+template<std::size_t...> struct seq{};
+
+template<std::size_t N, std::size_t... Is>
+struct gen_seq : gen_seq<N-1, N-1, Is...>{};
+
+template<std::size_t... Is>
+struct gen_seq<0, Is...> : seq<Is...>{};
+
+template<class Ch, class Tr, class Tuple, std::size_t... Is>
+void print_tuple(std::basic_ostream<Ch,Tr>& os, Tuple const& t, seq<Is...>){
+  using swallow = int[];
+  (void)swallow{0, (void(os << (Is == 0? "" : ", ") << std::get<Is>(t)), 0)...};
+}
+} // aux::
+
+template<class Ch, class Tr, class... Args>
+auto operator<<(std::basic_ostream<Ch, Tr>& os, std::tuple<Args...> const& t)
+    -> std::basic_ostream<Ch, Tr>&
+{
+  os << "(";
+  aux::print_tuple(os, t, aux::gen_seq<sizeof...(Args)>());
+  return os << ")";
+}
 
 class InternalNodeIterator;
 
@@ -185,40 +212,33 @@ InternalNodeIterator InternalNodeIterator::operator++(int dummy) {
 }
 
 BidirectionalBWTIndex::interval
-getArc(BidirectionalBWTIndex index,
+getArc(BidirectionalBWTIndex &index,
        BidirectionalBWTIndex::interval v,
        BidirectionalBWTIndex::value_type c) {
-  BidirectionalBWTIndex::size_type i, j;
+  BidirectionalBWTIndex::size_type i, j, ii, jj;
   std::tie(i, j) = v;
-  return std::make_tuple(index.forward.C[c] +
-                         index.forward.wavelet_tree.rank(i - 1, c) + 1,
-                         index.forward.C[c] +
-                         index.forward.wavelet_tree.rank(j, c));
+  sdsl::backward_search(index.forward, i, j, c, ii, jj);
+  return std::make_tuple(ii, jj);
 }
 
-namespace aux{
-template<std::size_t...> struct seq{};
-
-template<std::size_t N, std::size_t... Is>
-struct gen_seq : gen_seq<N-1, N-1, Is...>{};
-
-template<std::size_t... Is>
-struct gen_seq<0, Is...> : seq<Is...>{};
-
-template<class Ch, class Tr, class Tuple, std::size_t... Is>
-void print_tuple(std::basic_ostream<Ch,Tr>& os, Tuple const& t, seq<Is...>){
-  using swallow = int[];
-  (void)swallow{0, (void(os << (Is == 0? "" : ", ") << std::get<Is>(t)), 0)...};
-}
-} // aux::
-
-template<class Ch, class Tr, class... Args>
-auto operator<<(std::basic_ostream<Ch, Tr>& os, std::tuple<Args...> const& t)
-    -> std::basic_ostream<Ch, Tr>&
-{
-  os << "(";
-  aux::print_tuple(os, t, aux::gen_seq<sizeof...(Args)>());
-  return os << ")";
+BidirectionalBWTIndex::interval
+followArc(BidirectionalBWTIndex &index,
+          sdsl::bit_vector &first,
+          sdsl::rank_support &first_rank,
+          sdsl::select_support &first_select,
+          BidirectionalBWTIndex::interval v,
+          BidirectionalBWTIndex::value_type c) {
+  BidirectionalBWTIndex::size_type i, j;
+  std::tie(i, j) = getArc(index, v, c);
+  BidirectionalBWTIndex::size_type ii = i;
+  BidirectionalBWTIndex::size_type jj = j;
+  if (!first[i]) {
+    ii = first_select.select(first_rank.rank(i));
+  }
+  if (j < first.size() - 1) {
+    jj = first_select.select(first_rank.rank(j) + 1);
+  }
+  return std::make_tuple(ii, jj);
 }
 
 int main(int argc, char *argv[]) {
@@ -248,7 +268,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  std::cout << getArc(index, std::make_tuple(7, 9), index.forward.char2comp['C'])
+  sdsl::rank_support_v5<> first_rank(&first);
+  sdsl::select_support_mcl<> first_select(&first);
+  std::cout << followArc(index, first, first_rank, first_select,
+                         std::make_tuple(6, 8), 'G')
             << std::endl;
   return 0;
 }
