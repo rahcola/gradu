@@ -84,7 +84,6 @@ getFreqs(BidirectionalBWTIndex &index,
 
 int main(int argc, char *argv[]) {
   typedef BidirectionalBWTIndex::interval interval;
-  typedef BidirectionalBWTIndex::value_type value_type;
   typedef BidirectionalBWTIndex::size_type size_type;
 
   if (argc < 3) { return 1; }
@@ -96,7 +95,7 @@ int main(int argc, char *argv[]) {
   // sdsl::load_from_file(b, fbackward);
   // BidirectionalBWTIndex index(f, b);
   BidirectionalBWTIndex index(fforward, fbackward);
-  std::vector<value_type> symbols;
+  std::vector<std::tuple<interval, interval>> intervals;
   sdsl::bit_vector first(index.forward.size(), 1);
 
   for(auto it : index.internalNodeIterable()) {
@@ -105,9 +104,9 @@ int main(int argc, char *argv[]) {
     std::tie(ij, pq, d) = it;
     if (d >= 2) {
       bool first_c = true;
-      for (auto c : index.enumerateRight(pq, symbols)) {
+      for (auto is : index.extendRightAll(ij, pq, intervals)) {
         if (first_c) { first_c = false; continue; }
-        size_type i = std::get<0>(std::get<0>(index.extendRight(c, ij, pq)));
+        size_type i = std::get<0>(std::get<0>(is));
         first[i] = first[i] ^ 1;
       }
     }

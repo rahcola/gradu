@@ -2,6 +2,11 @@
 #include <sdsl/suffix_arrays.hpp>
 #include "BidirectionalBWTIndex.hpp"
 
+BidirectionalBWTIndex::size_type
+count_less(std::vector<BidirectionalBWTIndex::size_type> &,
+           std::vector<BidirectionalBWTIndex::size_type> &,
+           BidirectionalBWTIndex::size_type);
+
 BidirectionalBWTIndex::BidirectionalBWTIndex() { }
 
 BidirectionalBWTIndex::BidirectionalBWTIndex(std::string fforward,
@@ -81,10 +86,7 @@ BidirectionalBWTIndex::extendLeftAll(interval ij, interval pq, std::vector<std::
   for (std::vector<size_type>::size_type ix = 0; ix < symbol_count; ix++) {
     size_type ii, jj;
     sdsl::backward_search(forward, i, j, symbol_buffer[ix], ii, jj);
-    size_type k = 0;
-    for (std::vector<size_type>::size_type jx = 0; jx < ix; jx++) {
-      k += rank_j_buffer[jx] - rank_i_buffer[jx];
-    }
+    size_type k = count_less(rank_i_buffer, rank_j_buffer, ix);
     out[ix] = std::make_tuple(std::make_tuple(ii, jj),
                               std::make_tuple(p + k, p + k + jj - ii));
   }
@@ -101,13 +103,10 @@ BidirectionalBWTIndex::extendRightAll(interval ij, interval pq, std::vector<std:
                          symbol_count, symbol_buffer,
                          rank_i_buffer, rank_j_buffer);
   out.resize(symbol_count);
-  for (std::vector<size_type>::size_type ix = 0; ix < symbol_count; i++) {
+  for (std::vector<size_type>::size_type ix = 0; ix < symbol_count; ix++) {
     size_type pp, qq;
     sdsl::backward_search(backward, p, q, symbol_buffer[ix], pp, qq);
-    size_type k = 0;
-    for (std::vector<size_type>::size_type jx = 0; jx < ix; jx++) {
-      k += rank_j_buffer[jx] - rank_i_buffer[jx];
-    }
+    size_type k = count_less(rank_i_buffer, rank_j_buffer, ix);
     out[ix] = std::make_tuple(std::make_tuple(i + k, i + k + qq - pp),
                               std::make_tuple(pp, qq));
   }
@@ -120,6 +119,17 @@ bool BidirectionalBWTIndex::rightMaximal(interval ij) const {
   sdsl::interval_symbols(backward.wavelet_tree, i, j + 1,
                          k, symbol_buffer, rank_i_buffer, rank_j_buffer);
   return k > 1;
+}
+
+BidirectionalBWTIndex::size_type
+count_less(std::vector<BidirectionalBWTIndex::size_type> &rank_i_buffer,
+           std::vector<BidirectionalBWTIndex::size_type> &rank_j_buffer,
+           BidirectionalBWTIndex::size_type ix) {
+  BidirectionalBWTIndex::size_type k = 0;
+  for (std::vector<BidirectionalBWTIndex::size_type>::size_type jx = 0; jx < ix; jx++) {
+    k += rank_j_buffer[jx] - rank_i_buffer[jx];
+  }
+  return k;
 }
 
 InternalNodeIterable BidirectionalBWTIndex::internalNodeIterable() {
