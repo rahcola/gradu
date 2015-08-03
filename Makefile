@@ -1,4 +1,12 @@
-CFLAGS=-Wall -Werror -pedantic -O3
+CC=g++
+CFLAGS=-c -std=c++11 -Wall -Werror -pedantic -O3
+LFLAGS=-ldivsufsort -ldivsufsort64 -lsdsl
 
-de-bruijn: src/de-bruijn.cpp
-	g++ -std=c++11 $(CFLAGS) -I /usr/local/include -L /usr/local/lib/ $< -o $@ -ldivsufsort -ldivsufsort64 -lsdsl
+de-bruijn: de-bruijn.o BidirectionalBWTIndex.o
+	$(CC) $^ -o $@ $(LFLAGS)
+
+de-bruijn.o: src/de-bruijn.cpp
+	$(CC) $(CFLAGS) $< -o $@
+
+BidirectionalBWTIndex.o: src/BidirectionalBWTIndex.cpp src/BidirectionalBWTIndex.hpp
+	$(CC) $(CFLAGS) $< -o $@
