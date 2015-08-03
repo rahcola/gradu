@@ -84,8 +84,9 @@ BidirectionalBWTIndex::extendLeftAll(interval ij, interval pq, std::vector<std::
                          rank_i_buffer, rank_j_buffer);
   out.resize(symbol_count);
   for (std::vector<size_type>::size_type ix = 0; ix < symbol_count; ix++) {
-    size_type ii, jj;
-    sdsl::backward_search(forward, i, j, symbol_buffer[ix], ii, jj);
+    size_type c = backward.C[backward.char2comp[symbol_buffer[ix]]];
+    size_type ii = c + rank_i_buffer[ix];
+    size_type jj = c + rank_j_buffer[ix] - 1;
     size_type k = count_less(rank_i_buffer, rank_j_buffer, ix);
     out[ix] = std::make_tuple(std::make_tuple(ii, jj),
                               std::make_tuple(p + k, p + k + jj - ii));
@@ -104,8 +105,9 @@ BidirectionalBWTIndex::extendRightAll(interval ij, interval pq, std::vector<std:
                          rank_i_buffer, rank_j_buffer);
   out.resize(symbol_count);
   for (std::vector<size_type>::size_type ix = 0; ix < symbol_count; ix++) {
-    size_type pp, qq;
-    sdsl::backward_search(backward, p, q, symbol_buffer[ix], pp, qq);
+    size_type c = backward.C[backward.char2comp[symbol_buffer[ix]]];
+    size_type pp = c + rank_i_buffer[ix];
+    size_type qq = c + rank_j_buffer[ix] - 1;
     size_type k = count_less(rank_i_buffer, rank_j_buffer, ix);
     out[ix] = std::make_tuple(std::make_tuple(i + k, i + k + qq - pp),
                               std::make_tuple(pp, qq));
