@@ -7,24 +7,13 @@ count_less(std::vector<BidirectionalBWTIndex::size_type> &,
            std::vector<BidirectionalBWTIndex::size_type> &,
            BidirectionalBWTIndex::size_type);
 
-BidirectionalBWTIndex::BidirectionalBWTIndex() { }
-
-BidirectionalBWTIndex::BidirectionalBWTIndex(std::string fforward,
-                                             std::string fbackward) {
-  sdsl::construct(forward, fforward, 1);
-  sdsl::construct(backward, fbackward, 1);
-  symbol_buffer.resize(forward.sigma);
-  rank_i_buffer.resize(forward.sigma);
-  rank_j_buffer.resize(forward.sigma);
-}
-
-BidirectionalBWTIndex::BidirectionalBWTIndex(BidirectionalBWTIndex::index_type _forward,
-                                             BidirectionalBWTIndex::index_type _backward) {
-  forward = _forward;
-  backward = _backward;
-  symbol_buffer.resize(forward.sigma);
-  rank_i_buffer.resize(forward.sigma);
-  rank_j_buffer.resize(forward.sigma);
+BidirectionalBWTIndex::BidirectionalBWTIndex(BidirectionalBWTIndex::index_type &&_forward,
+                                             BidirectionalBWTIndex::index_type &&_backward)
+  : forward(std::move(_forward)),
+    backward(std::move(_backward)),
+    symbol_buffer(_forward.sigma),
+    rank_i_buffer(_forward.sigma),
+    rank_j_buffer(_forward.sigma) {
 }
 
 std::vector<BidirectionalBWTIndex::value_type>&
@@ -138,15 +127,16 @@ InternalNodeIterable BidirectionalBWTIndex::internalNodeIterable() {
   return InternalNodeIterable(*this);
 }
 
-InternalNodeIterator::InternalNodeIterator()
-  : index(BidirectionalBWTIndex()) { }
-
 InternalNodeIterator::InternalNodeIterator(const BidirectionalBWTIndex &_index)
   : index(_index) {
   stack.push(std::make_tuple(std::make_tuple(0, index.forward.size() - 1),
                              std::make_tuple(0, index.backward.size() - 1),
                              0));
 }
+
+InternalNodeIterator::InternalNodeIterator(const BidirectionalBWTIndex &_index,
+                                           bool end)
+  : index(_index) { }
 
 InternalNodeIterator::InternalNodeIterator(const InternalNodeIterator &other)
   : index(other.index), stack(other.stack) {
@@ -196,5 +186,5 @@ InternalNodeIterator InternalNodeIterable::begin() {
 }
 
 InternalNodeIterator InternalNodeIterable::end() {
-  return InternalNodeIterator();
+  return InternalNodeIterator(index, true);
 }

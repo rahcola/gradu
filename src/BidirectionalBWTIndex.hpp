@@ -9,12 +9,12 @@ public:
   index_type forward;
   index_type backward;
 
-  BidirectionalBWTIndex();
-  BidirectionalBWTIndex(std::string, std::string);
-  BidirectionalBWTIndex(index_type, index_type);
+  BidirectionalBWTIndex(index_type&&, index_type&&);
 
-  std::vector<value_type>& enumerateLeft(interval, std::vector<value_type>&) const;
-  std::vector<value_type>& enumerateRight(interval, std::vector<value_type>&) const;
+  std::vector<value_type>&
+  enumerateLeft(interval, std::vector<value_type>&) const;
+  std::vector<value_type>&
+  enumerateRight(interval, std::vector<value_type>&) const;
 
   std::tuple<BidirectionalBWTIndex::interval, BidirectionalBWTIndex::interval>
   extendLeft(value_type, interval, interval) const;
@@ -37,10 +37,11 @@ private:
 
 class InternalNodeIterator
   : public std::iterator<std::input_iterator_tag,
-                         std::tuple<BidirectionalBWTIndex::interval, unsigned int>> {
+                         std::tuple<BidirectionalBWTIndex::interval,
+                                    unsigned int>> {
 public:
-  InternalNodeIterator();
   InternalNodeIterator(const BidirectionalBWTIndex &);
+  InternalNodeIterator(const BidirectionalBWTIndex &, bool);
   InternalNodeIterator(const InternalNodeIterator &);
   std::tuple<BidirectionalBWTIndex::interval,
              BidirectionalBWTIndex::interval,
@@ -55,7 +56,8 @@ private:
                         BidirectionalBWTIndex::interval,
                         unsigned int>> stack;
   std::vector<BidirectionalBWTIndex::value_type> symbols;
-  std::vector<std::tuple<BidirectionalBWTIndex::interval, BidirectionalBWTIndex::interval>> intervals;
+  std::vector<std::tuple<BidirectionalBWTIndex::interval,
+                         BidirectionalBWTIndex::interval>> intervals;
 };
 
 class InternalNodeIterable {

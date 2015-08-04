@@ -6,6 +6,7 @@
 #include <sdsl/select_support.hpp>
 #include <sdsl/suffix_arrays.hpp>
 #include "BidirectionalBWTIndex.hpp"
+#include "DeBruijn.hpp"
 
 namespace aux{
 template<std::size_t...> struct seq{};
@@ -83,36 +84,20 @@ getFreqs(BidirectionalBWTIndex &index,
 }
 
 int main(int argc, char *argv[]) {
-  typedef BidirectionalBWTIndex::interval interval;
-  typedef BidirectionalBWTIndex::size_type size_type;
-
   if (argc < 3) { return 1; }
-  std::string fforward(argv[1]);
-  std::string fbackward(argv[2]);
-  BidirectionalBWTIndex index(fforward, fbackward);
-  std::vector<std::tuple<interval, interval>> intervals;
-  sdsl::bit_vector first(index.forward.size(), 1);
+  BidirectionalBWTIndex::index_type forward;
+  BidirectionalBWTIndex::index_type backward;
+  sdsl::construct(forward, argv[1], 1);
+  sdsl::construct(backward, argv[2], 1);
+  BidirectionalBWTIndex index(std::move(forward), std::move(backward));
+  DeBruijn graph(std::move(index));
 
-  std::cout << sdsl::size_in_mega_bytes(index.forward) << std::endl;
-  for(auto it : index.internalNodeIterable()) {
-    interval ij, pq;
-    unsigned int d;
-    std::tie(ij, pq, d) = it;
-    if (d >= 2) {
-      auto it = index.extendRightAll(ij, pq, intervals);
-      std::for_each(it.begin() + 1, it.end(),
-                    [&first](std::tuple<interval, interval> &t) {
-                      size_type i = std::get<0>(std::get<0>(t));
-                      first[i] = first[i] ^ 1;
-                    });
-    }
-  }
-
-  // for (unsigned int i = 0; i < first.size(); i++) {
-  //   std::cout << first[i]
+  // for (unsigned int i = 0; i < graph.first.size(); i++) {
+  //   std::cout << graph.first[i]
   //             << " "
-  //             << sdsl::extract(index.forward,
-  //                              index.forward[i], index.forward.size() - 1)
+  //             << sdsl::extract(graph.index.forward,
+  //                              graph.index.forward[i],
+  //                              graph.index.forward.size() - 1)
   //             << std::endl;
   // }
 
