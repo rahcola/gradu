@@ -33,56 +33,6 @@ auto operator<<(std::basic_ostream<Ch, Tr>& os, std::tuple<Args...> const& t)
   return os << ")";
 }
 
-BidirectionalBWTIndex::interval
-getArc(BidirectionalBWTIndex &index,
-       BidirectionalBWTIndex::interval v,
-       BidirectionalBWTIndex::value_type c) {
-  BidirectionalBWTIndex::size_type i, j, ii, jj;
-  std::tie(i, j) = v;
-  sdsl::backward_search(index.forward, i, j, c, ii, jj);
-  return std::make_tuple(ii, jj);
-}
-
-BidirectionalBWTIndex::interval
-followArc(BidirectionalBWTIndex &index,
-          sdsl::bit_vector &first,
-          sdsl::rank_support &first_rank,
-          sdsl::select_support &first_select,
-          BidirectionalBWTIndex::interval v,
-          BidirectionalBWTIndex::value_type c) {
-  BidirectionalBWTIndex::size_type i, j;
-  std::tie(i, j) = getArc(index, v, c);
-  BidirectionalBWTIndex::size_type ii = i;
-  BidirectionalBWTIndex::size_type jj = j;
-  if (!first[i]) {
-    ii = first_select.select(first_rank.rank(i));
-  }
-  if (j < first.size() - 1) {
-    jj = first_select.select(first_rank.rank(j) + 1);
-  }
-  return std::make_tuple(ii, jj);
-}
-
-std::vector<int>
-getFreqs(BidirectionalBWTIndex &index,
-         std::vector<BidirectionalBWTIndex::value_type> color_borders,
-         BidirectionalBWTIndex::interval v) {
-  std::vector<int> freqs(color_borders.size());
-  BidirectionalBWTIndex::size_type i, j;
-  std::tie(i, j) = v;
-  for (; i < j; i++) {
-    for (auto border = color_borders.begin();
-         border != color_borders.end();
-         border++) {
-      if (index.forward[i] < *border) {
-        freqs[border - color_borders.begin()] += 1;
-        break;
-      }
-    }
-  }
-  return freqs;
-}
-
 int main(int argc, char *argv[]) {
   if (argc < 3) { return 1; }
   BidirectionalBWTIndex::index_type forward;
@@ -92,14 +42,24 @@ int main(int argc, char *argv[]) {
   BidirectionalBWTIndex index(std::move(forward), std::move(backward));
   DeBruijn graph(std::move(index));
 
-  // for (unsigned int i = 0; i < graph.first.size(); i++) {
-  //   std::cout << graph.first[i]
-  //             << " "
-  //             << sdsl::extract(graph.index.forward,
-  //                              graph.index.forward[i],
-  //                              graph.index.forward.size() - 1)
-  //             << std::endl;
-  // }
+  for (unsigned int i = 0; i < graph.first.size(); i++) {
+    std::cout << std::setw(2)
+              << i
+              << " "
+              << graph.first[i]
+              << " "
+              << sdsl::extract(graph.index.forward,
+                               graph.index.forward[i],
+                               graph.index.forward.size() - 1)
+              << std::endl;
+  }
+
+  std::cout << graph.getArc(std::make_tuple(10, 13), 'A')
+            << " "
+            << graph.followArc(std::make_tuple(10, 13), 'A')
+            << " "
+            << graph.getFreq(graph.followArc(std::make_tuple(10, 13), 'A'))
+            << std::endl;
 
   return 0;
 }
