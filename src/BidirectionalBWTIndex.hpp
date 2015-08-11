@@ -2,7 +2,7 @@ class InternalNodeIterable;
 
 class BidirectionalBWTIndex {
 public:
-  typedef sdsl::csa_wt<sdsl::wt_hutu<>, 32, 32> index_type;
+  typedef sdsl::csa_wt<sdsl::wt_hutu<>> index_type;
   typedef index_type::wavelet_tree_type::value_type value_type;
   typedef index_type::wavelet_tree_type::size_type size_type;
   typedef std::tuple<size_type, size_type> interval;

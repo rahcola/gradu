@@ -41,25 +41,33 @@ int main(int argc, char *argv[]) {
   sdsl::construct(backward, argv[2], 1);
   BidirectionalBWTIndex index(std::move(forward), std::move(backward));
   DeBruijn graph(std::move(index));
+  std::vector<DeBruijn::size_type> offsets {4, graph.index.forward.size()};
+  DeBruijn::coloring coloring = graph.color(offsets);
 
-  for (unsigned int i = 0; i < graph.first.size(); i++) {
-    std::cout << std::setw(2)
-              << i
-              << " "
-              << graph.first[i]
-              << " "
-              << sdsl::extract(graph.index.forward,
-                               graph.index.forward[i],
-                               graph.index.forward.size() - 1)
-              << std::endl;
-  }
+  // for (unsigned int i = 0; i < graph.first.size(); i++) {
+  //   std::cout << std::setw(2)
+  //             << i
+  //             << " "
+  //             << graph.first[i]
+  //             << " "
+  //             << sdsl::extract(graph.index.forward,
+  //                              graph.index.forward[i],
+  //                              graph.index.forward.size() - 1)
+  //             << std::endl;
+  // }
 
-  std::cout << graph.getArc(std::make_tuple(10, 13), 'A')
-            << " "
-            << graph.followArc(std::make_tuple(10, 13), 'A')
-            << " "
-            << graph.getFreq(graph.followArc(std::make_tuple(10, 13), 'A'))
-            << std::endl;
+  // std::cout << graph.getArc(std::make_tuple(10, 13), 'A')
+  //           << " "
+  //           << graph.followArc(graph.getArc(std::make_tuple(10, 13), 'A'))
+  //           << " "
+  //           << graph.getFreq(graph.followArc(graph.getArc(std::make_tuple(10, 13), 'A')))
+  //           << " "
+  //           << graph.getFreq(graph.followArc(graph.getArc(std::make_tuple(10, 13), 'A')),
+  //                            coloring)[0]
+  //           << " "
+  //           << graph.getFreq(graph.followArc(graph.getArc(std::make_tuple(10, 13), 'A')),
+  //                            coloring)[1]
+  //           << std::endl;
 
   return 0;
 }
