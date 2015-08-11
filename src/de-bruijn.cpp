@@ -41,8 +41,26 @@ int main(int argc, char *argv[]) {
   sdsl::construct(backward, argv[2], 1);
   BidirectionalBWTIndex index(std::move(forward), std::move(backward));
   DeBruijn graph(std::move(index));
-  std::vector<DeBruijn::size_type> offsets {4, graph.index.forward.size()};
+  std::vector<DeBruijn::size_type> offsets {graph.index.forward.size() / 4,
+                                            2 * graph.index.forward.size() / 4,
+                                            3 * graph.index.forward.size() / 4,
+                                            graph.index.forward.size()};
   DeBruijn::coloring coloring = graph.color(offsets);
+  std::cout << "index: "
+            << (sdsl::size_in_mega_bytes(graph.index.forward) +
+                sdsl::size_in_mega_bytes(graph.index.backward))
+            << std::endl;
+  std::cout << "first: "
+            << (sdsl::size_in_mega_bytes(graph.first) +
+                sdsl::size_in_mega_bytes(graph.first_rank) +
+                sdsl::size_in_mega_bytes(graph.first_select))
+            << std::endl;
+  double size = 0;
+  for (unsigned int i = 0; i < coloring.size(); i++) {
+    size += sdsl::size_in_mega_bytes(std::get<0>(coloring[i]));
+    size += sdsl::size_in_mega_bytes(std::get<1>(coloring[i]));
+  }
+  std::cout << "coloring: " << size << std::endl;
 
   // for (unsigned int i = 0; i < graph.first.size(); i++) {
   //   std::cout << std::setw(2)
@@ -61,8 +79,8 @@ int main(int argc, char *argv[]) {
   //           << graph.followArc(graph.getArc(std::make_tuple(10, 13), 'A'))
   //           << " "
   //           << graph.getFreq(graph.followArc(graph.getArc(std::make_tuple(10, 13), 'A')))
-  //           << " "
-  //           << graph.getFreq(graph.followArc(graph.getArc(std::make_tuple(10, 13), 'A')),
+  //           << std::endl;
+  // std::cout << graph.getFreq(graph.followArc(graph.getArc(std::make_tuple(10, 13), 'A')),
   //                            coloring)[0]
   //           << " "
   //           << graph.getFreq(graph.followArc(graph.getArc(std::make_tuple(10, 13), 'A')),

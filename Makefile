@@ -11,5 +11,5 @@ de-bruijn.o: src/de-bruijn.cpp src/BidirectionalBWTIndex.hpp src/DeBruijn.hpp
 BidirectionalBWTIndex.o: src/BidirectionalBWTIndex.cpp src/BidirectionalBWTIndex.hpp
 	$(CC) $(CFLAGS) $< -o $@
 
-DeBruijn.o: src/DeBruijn.cpp src/DeBruijn.hpp
+DeBruijn.o: src/DeBruijn.cpp src/DeBruijn.hpp src/BidirectionalBWTIndex.hpp
 	$(CC) $(CFLAGS) $< -o $@

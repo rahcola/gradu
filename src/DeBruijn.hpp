@@ -4,10 +4,10 @@ public:
   typedef BidirectionalBWTIndex::interval edge;
   typedef BidirectionalBWTIndex::value_type symbol;
   typedef BidirectionalBWTIndex::size_type size_type;
-  typedef std::vector<std::tuple<sdsl::bit_vector, sdsl::select_support_mcl<>>> coloring;
+  typedef std::vector<std::tuple<sdsl::sd_vector<>, sdsl::select_support_sd<>>> coloring;
 
   BidirectionalBWTIndex index;
-  sdsl::bit_vector first;
+  sdsl::sd_vector<> first;
 
   DeBruijn(BidirectionalBWTIndex&&);
 
@@ -20,8 +20,8 @@ public:
 
   coloring color(std::vector<size_type>&);
 
-  typedef sdsl::rank_support_v<> rank_support;
-  typedef sdsl::select_support_mcl<> select_support;
+  typedef sdsl::rank_support_sd<> rank_support;
+  typedef sdsl::select_support_sd<> select_support;
   rank_support first_rank;
   select_support first_select;
 };

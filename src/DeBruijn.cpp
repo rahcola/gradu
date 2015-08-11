@@ -5,9 +5,10 @@
 #include "DeBruijn.hpp"
 
 DeBruijn::DeBruijn(BidirectionalBWTIndex &&_index)
-  : index(std::move(_index)), first(_index.forward.size(), 1) {
+  : index(std::move(_index)) {
   typedef DeBruijn::size_type size_type;
   typedef BidirectionalBWTIndex::interval interval;
+  sdsl::bit_vector uncompressed_first(index.forward.size(), 1);
   std::vector<std::tuple<interval, interval>> intervals;
   for(auto it : index.internalNodeIterable()) {
     interval ij, pq;
@@ -16,12 +17,14 @@ DeBruijn::DeBruijn(BidirectionalBWTIndex &&_index)
     if (d >= 2) {
       auto it = index.extendRightAll(ij, pq, intervals);
       std::for_each(it.begin() + 1, it.end(),
-                    [this](std::tuple<interval, interval> &t) {
+                    [&uncompressed_first](std::tuple<interval, interval> &t) {
                       size_type i = std::get<0>(std::get<0>(t));
-                      first[i] = first[i] ^ 1;
+                      uncompressed_first[i] = uncompressed_first[i] ^ 1;
                     });
     }
   }
+  sdsl::sd_vector<> tmp(uncompressed_first);
+  first.swap(tmp);
   sdsl::util::init_support(first_rank, &first);
   sdsl::util::init_support(first_select, &first);
 }
@@ -64,14 +67,12 @@ std::vector<DeBruijn::size_type> DeBruijn::getFreq(DeBruijn::node v,
 DeBruijn::coloring DeBruijn::color(std::vector<DeBruijn::size_type> &offsets) {
   size_type m = index.forward.size();
   rank_support::size_type n = first_rank(m) + 1;
-  coloring c(offsets.size(),
-             std::make_tuple(sdsl::bit_vector(m + n, 0),
-                             sdsl::select_support_mcl<>()));
+  std::vector<sdsl::bit_vector> bits(offsets.size(), sdsl::bit_vector(m + n, 0));
   std::vector<sdsl::bit_vector::size_type> sums(offsets.size(), 0);
   for (size_type i = 0; i < m; i++) {
     if (first[i]) {
-      for (unsigned int j = 0; j < c.size(); j++) {
-        std::get<0>(c[j])[sums[j]] = 1;
+      for (unsigned int j = 0; j < bits.size(); j++) {
+        bits[j][sums[j]] = 1;
         sums[j]++;
       }
     }
@@ -83,8 +84,12 @@ DeBruijn::coloring DeBruijn::color(std::vector<DeBruijn::size_type> &offsets) {
       }
     }
   }
-  for (unsigned int i = 0; i < c.size(); i++) {
-    std::get<0>(c[i])[sums[i]] = 1;
+  coloring c;
+  for (unsigned int i = 0; i < offsets.size(); i++) {
+    bits[i][sums[i]] = 1;
+    c.emplace_back(sdsl::sd_vector<> (bits[i]), sdsl::select_support_sd<> ());
+  }
+  for (unsigned int i = 0; i < offsets.size(); i++) {
     sdsl::util::init_support(std::get<1>(c[i]), &std::get<0>(c[i]));
   }
   return c;
