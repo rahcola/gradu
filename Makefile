@@ -1,15 +1,18 @@
-CC=g++
-CFLAGS=-c -std=c++11 -Wall -Werror -pedantic -O3
-LFLAGS=-ldivsufsort -ldivsufsort64 -lsdsl
+SHELL=/bin/sh
+CXX=g++
+CXXFLAGS=-c -std=c++11 -Wall -Werror -pedantic -O3
+LDFLAGS=-ldivsufsort -ldivsufsort64 -lsdsl
 
-de-bruijn: de-bruijn.o BidirectionalBWTIndex.o DeBruijn.o
-	$(CC) $^ -o $@ $(LFLAGS)
+all: target/de-bruijn
 
-de-bruijn.o: src/de-bruijn.cpp src/BidirectionalBWTIndex.hpp src/DeBruijn.hpp
-	$(CC) $(CFLAGS) $< -o $@
+target/%.o: src/%.cpp | target
+	$(CXX) -c $(CXXFLAGS) $< -o $@
 
-BidirectionalBWTIndex.o: src/BidirectionalBWTIndex.cpp src/BidirectionalBWTIndex.hpp
-	$(CC) $(CFLAGS) $< -o $@
+target/de-bruijn: target/de-bruijn.o target/BidirectionalBWTIndex.o target/DeBruijn.o | target
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
-DeBruijn.o: src/DeBruijn.cpp src/DeBruijn.hpp src/BidirectionalBWTIndex.hpp
-	$(CC) $(CFLAGS) $< -o $@
+target:
+	mkdir target
+
+clean:
+	rm -f ./target/*
