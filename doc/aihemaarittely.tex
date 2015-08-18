@@ -1,0 +1,155 @@
+% --- Template for thesis / report with tktltiki2 class ---
+% 
+% last updated 2013/02/15 for tkltiki2 v1.02
+
+\documentclass[finnish]{tktltiki2}
+
+% tktltiki2 automatically loads babel, so you can simply
+% give the language parameter (e.g. finnish, swedish, english, british) as
+% a parameter for the class: \documentclass[finnish]{tktltiki2}.
+% The information on title and abstract is generated automatically depending on
+% the language, see below if you need to change any of these manually.
+% 
+% Class options:
+% - grading                 -- Print labels for grading information on the front page.
+% - disablelastpagecounter  -- Disables the automatic generation of page number information
+%                              in the abstract. See also \numberofpagesinformation{} command below.
+%
+% The class also respects the following options of article class:
+%   10pt, 11pt, 12pt, final, draft, oneside, twoside,
+%   openright, openany, onecolumn, twocolumn, leqno, fleqn
+%
+% The default font size is 11pt. The paper size used is A4, other sizes are not supported.
+%
+% rubber: module pdftex
+
+% --- General packages ---
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsfonts,amsmath,amssymb,amsthm,booktabs,color,enumitem,graphicx}
+\usepackage[pdftex,hidelinks]{hyperref}
+
+% Automatically set the PDF metadata fields
+\makeatletter
+\AtBeginDocument{\hypersetup{pdftitle = {\@title}, pdfauthor = {\@author}}}
+\makeatother
+
+% --- Language-related settings ---
+%
+% these should be modified according to your language
+
+% babelbib for non-english bibliography using bibtex
+\usepackage[fixlanguage]{babelbib}
+\selectbiblanguage{finnish}
+
+% add bibliography to the table of contents
+\usepackage[nottoc]{tocbibind}
+% tocbibind renames the bibliography, use the following to change it back
+\settocbibname{Lähteet}
+
+% --- Theorem environment definitions ---
+
+\newtheorem{lau}{Lause}
+\newtheorem{lem}[lau]{Lemma}
+\newtheorem{kor}[lau]{Korollaari}
+
+\theoremstyle{definition}
+\newtheorem{maar}[lau]{Määritelmä}
+\newtheorem{ong}{Ongelma}
+\newtheorem{alg}[lau]{Algoritmi}
+\newtheorem{esim}[lau]{Esimerkki}
+
+\theoremstyle{remark}
+\newtheorem*{huom}{Huomautus}
+
+
+% --- tktltiki2 options ---
+%
+% The following commands define the information used to generate title and
+% abstract pages. The following entries should be always specified:
+
+\title{De Bruijn verkkojen muistitehokas esittäminen}
+\author{Jani Rahkola}
+\date{\today}
+\level{Aihemäärittely}
+\abstract{}
+
+% The following can be used to specify keywords and classification of the paper:
+
+\keywords{}
+
+% classification according to ACM Computing Classification System (http://www.acm.org/about/class/)
+% This is probably mostly relevant for computer scientists
+% uncomment the following; contents of \classification will be printed under the abstract with a title
+% "ACM Computing Classification System (CCS):"
+% \classification{}
+
+% If the automatic page number counting is not working as desired in your case,
+% uncomment the following to manually set the number of pages displayed in the abstract page:
+%
+% \numberofpagesinformation{16 sivua + 10 sivua liitteissä}
+%
+% If you are not a computer scientist, you will want to uncomment the following by hand and specify
+% your department, faculty and subject by hand:
+%
+% \faculty{Matemaattis-luonnontieteellinen}
+% \department{Tietojenkäsittelytieteen laitos}
+% \subject{Tietojenkäsittelytiede}
+%
+% If you are not from the University of Helsinki, then you will most likely want to set these also:
+%
+% \university{Helsingin Yliopisto}
+% \universitylong{HELSINGIN YLIOPISTO --- HELSINGFORS UNIVERSITET --- UNIVERSITY OF HELSINKI} % displayed on the top of the abstract page
+% \city{Helsinki}
+%
+
+
+\begin{document}
+
+% --- Front matter ---
+
+\frontmatter      % roman page numbering for front matter
+
+\maketitle        % title page
+\makeabstract     % abstract page
+
+\tableofcontents  % table of contents
+
+% --- Main matter ---
+
+\mainmatter       % clear page, start arabic page numbering
+
+\section{De Bruijn verkko}
+
+% Write some science here.
+
+De Bruijn verkko.
+
+
+% --- References ---
+%
+% bibtex is used to generate the bibliography. The babplain style
+% will generate numeric references (e.g. [1]) appropriate for theoretical
+% computer science. If you need alphanumeric references (e.g [Tur90]), use
+%
+% \bibliographystyle{babalpha-lf}
+%
+% instead.
+
+\bibliographystyle{babplain-lf}
+\bibliography{viitteet}
+
+
+% --- Appendices ---
+
+% uncomment the following
+
+% \newpage
+% \appendix
+% 
+% \section{Esimerkkiliite}
+
+\end{document}

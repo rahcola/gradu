@@ -1,2 +1,12 @@
 de-bruijn
 *.o
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.sdsl
+*.blg
+*.out
+*.pdf
+*.toc
+*.bbl
