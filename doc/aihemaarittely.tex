@@ -124,10 +124,35 @@
 
 \section{De Bruijn verkko}
 
-% Write some science here.
+Olkoon \(\Sigma\) aakkosto ja \(m\) se koko. Asteluvun \(n\) De Bruijn verkko
+koostuu \(m^n\) solmusta ja \(m^{n+1}\) suunnatusta kaaresta. Jokainen solmu
+vastaa yhtä \(n\) mittaista, ja jokainen kaari \(n + 1\) mittaista,
+aakkostosta \(\Sigma\) muodostettua merkkijonoa. Kaari yhdistää kaksi solmua
+jos lähtösolmun \(n - 1\) viimeistä merkkiä ovat samat kuin maalisolmun \(n -
+1\) ensimmäistä merkkiä. Tällöin kaaren merkkijono on lähtösolmun merkkijono
+jatkettuna maalisolmun viimeisellä merkillä.
 
-De Bruijn verkko.
+Bioinformatiikassa kiinnostavia ovat De Bruijn verkkojen aliverkot joissa ovat
+mukana vain ne solmut ja kaaret joiden merkkijonot esiintyvät osamerkkijonoina
+syötemerkkijonossa. Niitä käytetään erityisesti \textit{de novo} kokoonpanossa
+jossa useista sekvensoiduista DNA pätkistä muodostetaan De Bruijn verkko jonka
+ominaisuuksia hyödyntäen pyritään selvittämään sekvensoinnin kohteena ollut
+DNA. Koska syötemerkkijonot voivat olla kymmeniä miljoonia merkkejä pitkiä ja
+kiinnostavat De Bruijn verkon asteluvut 20 molemmin puolin, on verkon tehokas
+esittäminen tärkeää.
 
+Tutkielmassa käydään läpi eri De Bruijn verkkojen esittämiseen kehitettyjä
+tietorakenteita ja vertaillaan niiden tila- ja aikatehokkuutta. Vertailun
+kohteena ovat myös tietorakenteiden rakentamiseen tarvittavat algoritmit ja
+niiden tarjoamat operaatiot.
+
+Tutkielman yhteydessä myös toteutetaan Välimäen ja Rivalsin esittelemä
+Burrows-Wheeler muunnokseen pohjautuva tietorakenne ja pyritään laajentamaan
+sitä tukemaan värjäystä. Värjätyssä De Bruijn verkossa syötemerkkijono koostuu
+useasta osasyötteestä ja jokaiseen solmuun on liitetty tieto siitä kuinka
+monta kertaa kyseisen solmun merkkijono esiintyy missäkin osasyötteessä.
+Värjäyksestä on hyötyä \textit{do novo} kokoonpanossa ja muissa De Bruijn
+verkkoa hyödyntävissä bioinformatiikan menetelmissä.
 
 % --- References ---
 %
