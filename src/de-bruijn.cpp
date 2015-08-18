@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
   sdsl::construct(forward, argv[1], 1);
   sdsl::construct(backward, argv[2], 1);
   BidirectionalBWTIndex index(std::move(forward), std::move(backward));
-  DeBruijn graph(std::move(index));
+  DeBruijn graph(std::move(index), 23);
   std::vector<DeBruijn::size_type> offsets {graph.index.forward.size() / 4,
                                             2 * graph.index.forward.size() / 4,
                                             3 * graph.index.forward.size() / 4,
@@ -61,6 +61,8 @@ int main(int argc, char *argv[]) {
     size += sdsl::size_in_mega_bytes(std::get<1>(coloring[i]));
   }
   std::cout << "coloring: " << size << std::endl;
+
+  std::cout << "|V|: " << graph.first_rank.rank(graph.first.size()) << std::endl;
 
   // for (unsigned int i = 0; i < graph.first.size(); i++) {
   //   std::cout << std::setw(2)

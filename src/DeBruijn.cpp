@@ -4,7 +4,7 @@
 #include "BidirectionalBWTIndex.hpp"
 #include "DeBruijn.hpp"
 
-DeBruijn::DeBruijn(BidirectionalBWTIndex &&_index)
+DeBruijn::DeBruijn(BidirectionalBWTIndex &&_index, unsigned int k)
   : index(std::move(_index)) {
   typedef DeBruijn::size_type size_type;
   typedef BidirectionalBWTIndex::interval interval;
@@ -14,7 +14,7 @@ DeBruijn::DeBruijn(BidirectionalBWTIndex &&_index)
     interval ij, pq;
     unsigned int d;
     std::tie(ij, pq, d) = it;
-    if (d >= 2) {
+    if (d >= k) {
       auto it = index.extendRightAll(ij, pq, intervals);
       std::for_each(it.begin() + 1, it.end(),
                     [&uncompressed_first](std::tuple<interval, interval> &t) {
@@ -23,7 +23,7 @@ DeBruijn::DeBruijn(BidirectionalBWTIndex &&_index)
                     });
     }
   }
-  sdsl::sd_vector<> tmp(uncompressed_first);
+  first_vector tmp(uncompressed_first);
   first.swap(tmp);
   sdsl::util::init_support(first_rank, &first);
   sdsl::util::init_support(first_select, &first);
@@ -66,7 +66,7 @@ std::vector<DeBruijn::size_type> DeBruijn::getFreq(DeBruijn::node v,
 
 DeBruijn::coloring DeBruijn::color(std::vector<DeBruijn::size_type> &offsets) {
   size_type m = index.forward.size();
-  rank_support::size_type n = first_rank(m) + 1;
+  first_vector::rank_1_type::size_type n = first_rank(m) + 1;
   std::vector<sdsl::bit_vector> bits(offsets.size(), sdsl::bit_vector(m + n, 0));
   std::vector<sdsl::bit_vector::size_type> sums(offsets.size(), 0);
   for (size_type i = 0; i < m; i++) {
@@ -87,7 +87,7 @@ DeBruijn::coloring DeBruijn::color(std::vector<DeBruijn::size_type> &offsets) {
   coloring c;
   for (unsigned int i = 0; i < offsets.size(); i++) {
     bits[i][sums[i]] = 1;
-    c.emplace_back(sdsl::sd_vector<> (bits[i]), sdsl::select_support_sd<> ());
+    c.emplace_back(coloring_vector (bits[i]), coloring_vector::select_1_type ());
   }
   for (unsigned int i = 0; i < offsets.size(); i++) {
     sdsl::util::init_support(std::get<1>(c[i]), &std::get<0>(c[i]));
