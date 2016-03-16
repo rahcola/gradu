@@ -114,9 +114,6 @@
 \frontmatter      % roman page numbering for front matter
 
 \maketitle        % title page
-\makeabstract     % abstract page
-
-\tableofcontents  % table of contents
 
 % --- Main matter ---
 
@@ -132,27 +129,23 @@ jos lähtösolmun \(n - 1\) viimeistä merkkiä ovat samat kuin maalisolmun \(n 
 1\) ensimmäistä merkkiä. Tällöin kaaren merkkijono on lähtösolmun merkkijono
 jatkettuna maalisolmun viimeisellä merkillä.
 
-Bioinformatiikassa kiinnostavia ovat De Bruijn verkkojen aliverkot joissa ovat
-mukana vain ne solmut ja kaaret joiden merkkijonot esiintyvät osamerkkijonoina
-syötemerkkijonossa. Niitä käytetään erityisesti \textit{de novo} kokoonpanossa
-jossa useista sekvensoiduista DNA pätkistä muodostetaan De Bruijn verkko jonka
-ominaisuuksia hyödyntäen pyritään selvittämään sekvensoinnin kohteena ollut
-DNA. Koska syötemerkkijonot voivat olla kymmeniä miljoonia merkkejä pitkiä ja
-kiinnostavat De Bruijn verkon asteluvut 20 molemmin puolin, on verkon tehokas
-esittäminen tärkeää.
+Eräs De Bruijn verkkojen sovellus on bioinformatiikassa suoritettava DNA
+järjestyksien \textit{de novo} yhdistäminen \cite{iduryramanawaterman1995}.
+Siinä yhdistettävien DNA järjestyksien kaikki \(k\):n mittaiset
+alimerkkijonot, k-grammit, tulkitaan asteluvun \(k\) De Bruijn verkon
+aliverkkona. Tässä verkossa kaaret edustavat \(k - 1\) mittaisia
+päällekkäisyyksiä k-grammeissa ja täten myös yhdistettävissä DNA
+järjestyksissä.
 
-Tutkielmassa käydään läpi eri De Bruijn verkkojen esittämiseen kehitettyjä
-tietorakenteita ja vertaillaan niiden tila- ja aikatehokkuutta. Vertailun
-kohteena ovat myös tietorakenteiden rakentamiseen tarvittavat algoritmit ja
-niiden tarjoamat operaatiot.
+Koska De Bruijn verkon solmujen määrä kasvaa eksponentiaalisesti asteluvun
+kasvaessa, ja \textit{do novo} yhdistämissessä käytetyt De Bruijn verkot ovat
+asteeltaan 20 tietämillä, tarvitaan verkon esittämiseen muistinkäytöltään
+tehokkaita tietorakenteita. Tutkielmassa käydään läpi eri De Bruijn verkkojen
+esittämiseen kehitettyjä tietorakenteita ???.
 
-Tutkielman yhteydessä myös toteutetaan Välimäen ja Rivalsin esittelemä
-Burrows-Wheeler muunnokseen pohjautuva tietorakenne ja pyritään laajentamaan
-sitä tukemaan värjäystä. Värjätyssä De Bruijn verkossa syötemerkkijono koostuu
-useasta osasyötteestä ja jokaiseen solmuun on liitetty tieto siitä kuinka
-monta kertaa kyseisen solmun merkkijono esiintyy missäkin osasyötteessä.
-Värjäyksestä on hyötyä \textit{do novo} kokoonpanossa ja muissa De Bruijn
-verkkoa hyödyntävissä bioinformatiikan menetelmissä.
+Tutkielman yhteydessä myös toteutetaan Välimäen ja Rivalsin
+\cite{rivalvalimaki2013} esittelemä Burrows-Wheeler muunnokseen pohjautuva
+tietorakenne.
 
 % --- References ---
 %
@@ -164,7 +157,7 @@ verkkoa hyödyntävissä bioinformatiikan menetelmissä.
 %
 % instead.
 
-\bibliographystyle{babplain-lf}
+\bibliographystyle{babalpha-lf}
 \bibliography{viitteet}
 
 
@@ -174,7 +167,7 @@ verkkoa hyödyntävissä bioinformatiikan menetelmissä.
 
 % \newpage
 % \appendix
-% 
+%
 % \section{Esimerkkiliite}
 
 \end{document}
